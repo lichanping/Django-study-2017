@@ -95,6 +95,28 @@ class QuestionDetailViewTests(TestCase):
         self.assertContains(response, past_question.question_text)
 
 
+class QuestionResultViewTests(TestCase):
+    def test_future_question(self):
+        """
+        The result view of a question with a pub_date in the future returns a 404 not found.
+        :return:
+        """
+        future_question = create_question(question_text='Future question.', days=5)
+        url = reverse('polls:results', args=(future_question.id,))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_past_question(self):
+        """
+        The result view of a question with pub_date in the past displays the question's text.
+        :return:
+        """
+        past_question = create_question(question_text='Past question', days=-5)
+        url = reverse('polls:results', args=(past_question.id,))
+        response = self.client.get(url)
+        self.assertContains(response, past_question.question_text)
+
+
 class QuestionModelTests(TestCase):
     def test_was_published_recently_with_future_question(self):
         """
